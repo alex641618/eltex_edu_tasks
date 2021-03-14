@@ -1,5 +1,5 @@
 all:
-	gcc float.c -o float
-	./float
+	gcc bo.c -o bo
+	./bo
 clean:
-	rm -rf float
+	rm -rf bo

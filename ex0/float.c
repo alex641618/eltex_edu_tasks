@@ -2,6 +2,7 @@
 16777216{10} -> 0|10010111|00000000000000000000000{2}*/
 
 #include <stdio.h>
+#include <unistd.h>
 
 int main()
 {
@@ -10,6 +11,7 @@ int main()
 	{
 		printf("a = %f\n", a);
 		a++;
+		sleep(5);
 	}
 	return 0;
 }
