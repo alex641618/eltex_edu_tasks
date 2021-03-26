@@ -73,7 +73,7 @@ int main() {
 				}
             }
 			break;
-			case '3':
+			case '4':
 			exit=1;
 			break;
 		}
