@@ -1,0 +1,513 @@
+ 0x0000555555554764 <+74>:	retq   
+End of assembler dump.
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 14354] will be killed.
+
+Quit anyway? (y or n) y
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# nano genfile.c 
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# nano genfile.c 
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# gcc genfile.c -o genfile 
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# ./genfile 
+
+l
+k
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# nano pass.txt 
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# ./genfile 
+
+l
+k
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# nano genfile.c 
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# ./genfile 
+
+l
+k
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# nano pass.txt 
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# nano pass.txt 
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# gdb ./password
+GNU gdb (Ubuntu 8.1.1-0ubuntu1) 8.1.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./password...done.
+(gdb) b 12
+Breakpoint 1 at 0x72e: file password.c, line 12.
+(gdb) run
+Starting program: /home/alex/Alushkin/ex5/password 
+Enter password:
+
+Breakpoint 1, main () at password.c:12
+12		PwStatus = IsPassOk();
+(gdb) s
+IsPassOk () at password.c:28
+28		gets(Pass);
+(gdb) info frame
+Stack level 0, frame at 0x7fffffffe360:
+ rip = 0x55555555476d in IsPassOk (password.c:28); saved rip = 0x555555554733
+ called by frame at 0x7fffffffe380
+ source language c.
+ Arglist at 0x7fffffffe350, args: 
+ Locals at 0x7fffffffe350, Previous frame's sp is 0x7fffffffe360
+ Saved registers:
+  rbp at 0x7fffffffe350, rip at 0x7fffffffe358
+(gdb) p $rsp
+$1 = (void *) 0x7fffffffe340
+(gdb) x/32xb 0x7fffffffe340
+0x7fffffffe340:	0x70	0xe3	0xff	0xff	0xff	0x7f	0x00	0x00
+0x7fffffffe348:	0x10	0x46	0x55	0x55	0x55	0x55	0x00	0x00
+0x7fffffffe350:	0x70	0xe3	0xff	0xff	0xff	0x7f	0x00	0x00
+0x7fffffffe358:	0x33	0x47	0x55	0x55	0x55	0x55	0x00	0x00
+(gdb) n
+333333333333^@����^?^@^@3GUUUU^@^@
+30		return 0 == strcmp(Pass, "test");
+(gdb) x/32xb 0x7fffffffe340
+0x7fffffffe340:	0x70	0xe3	0xff	0xff	0x33	0x33	0x33	0x33
+0x7fffffffe348:	0x33	0x33	0x33	0x33	0x33	0x33	0x33	0x33
+0x7fffffffe350:	0x5e	0x40	0xef	0xbf	0xbd	0xef	0xbf	0xbd
+0x7fffffffe358:	0xef	0xbf	0xbd	0xef	0xbf	0xbd	0x5e	0x3f
+(gdb) n
+31	}
+(gdb) 
+
+Program received signal SIGSEGV, Segmentation fault.
+0x000055555555479a in IsPassOk () at password.c:31
+31	}
+(gdb) n
+
+Program terminated with signal SIGSEGV, Segmentation fault.
+The program no longer exists.
+(gdb) 
+The program is not being run.
+(gdb) 
+The program is not being run.
+(gdb) quit
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# ls
+genfile  genfile.c  Makefile  pass.sh  pass.txt  password  password.c
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# gdb ./password
+GNU gdb (Ubuntu 8.1.1-0ubuntu1) 8.1.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./password...done.
+(gdb) b 12 
+Breakpoint 1 at 0x72e: file password.c, line 12.
+(gdb) run < pass.txt
+Starting program: /home/alex/Alushkin/ex5/password < pass.txt
+Enter password:
+
+Breakpoint 1, main () at password.c:12
+12		PwStatus = IsPassOk();
+(gdb) step
+IsPassOk () at password.c:28
+28		gets(Pass);
+(gdb) n
+30		return 0 == strcmp(Pass, "test");
+(gdb) info frame
+Stack level 0, frame at 0x7fffffffe360:
+ rip = 0x55555555477e in IsPassOk (password.c:30); saved rip = 0x555555554733
+ called by frame at 0x7fffffffe310
+ source language c.
+ Arglist at 0x7fffffffe350, args: 
+ Locals at 0x7fffffffe350, Previous frame's sp is 0x7fffffffe360
+ Saved registers:
+  rbp at 0x7fffffffe350, rip at 0x7fffffffe358
+(gdb) p $rsp
+$1 = (void *) 0x7fffffffe340
+(gdb) x/32xb 0x7fffffffe340
+0x7fffffffe340:	0x70	0xe3	0xff	0xff	0x33	0x33	0x33	0x33
+0x7fffffffe348:	0x33	0x33	0x33	0x33	0x33	0x33	0x33	0x33
+0x7fffffffe350:	0x00	0xe3	0xff	0xff	0xff	0x7f	0x00	0x00
+0x7fffffffe358:	0x33	0x47	0x55	0x55	0x55	0x55	0x00	0x00
+(gdb) n
+31	}
+(gdb) 
+main () at password.c:14
+14		if (PwStatus == 0) {
+(gdb) 
+15			printf("Bad password!\n");
+(gdb) 
+Bad password!
+16			exit(1);
+(gdb) 
+[Inferior 1 (process 14736) exited with code 01]
+(gdb) 
+The program is not being run.
+(gdb) quit
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# ./genfile 
+
+l
+k
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# gdb ./password
+GNU gdb (Ubuntu 8.1.1-0ubuntu1) 8.1.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./password...done.
+(gdb) b 12
+Breakpoint 1 at 0x72e: file password.c, line 12.
+(gdb) run < pass.txt
+Starting program: /home/alex/Alushkin/ex5/password < pass.txt
+Enter password:
+
+Breakpoint 1, main () at password.c:12
+12		PwStatus = IsPassOk();
+(gdb) s
+IsPassOk () at password.c:28
+28		gets(Pass);
+(gdb) info frame
+Stack level 0, frame at 0x7fffffffe360:
+ rip = 0x55555555476d in IsPassOk (password.c:28); saved rip = 0x555555554733
+ called by frame at 0x7fffffffe380
+ source language c.
+ Arglist at 0x7fffffffe350, args: 
+ Locals at 0x7fffffffe350, Previous frame's sp is 0x7fffffffe360
+ Saved registers:
+  rbp at 0x7fffffffe350, rip at 0x7fffffffe358
+(gdb) p $rsp
+$1 = (void *) 0x7fffffffe340
+(gdb) x/32bx 0x7fffffffe340
+0x7fffffffe340:	0x70	0xe3	0xff	0xff	0xff	0x7f	0x00	0x00
+0x7fffffffe348:	0x10	0x46	0x55	0x55	0x55	0x55	0x00	0x00
+0x7fffffffe350:	0x70	0xe3	0xff	0xff	0xff	0x7f	0x00	0x00
+0x7fffffffe358:	0x33	0x47	0x55	0x55	0x55	0x55	0x00	0x00
+(gdb) n
+30		return 0 == strcmp(Pass, "test");
+(gdb) 
+31	}
+(gdb) 
+main () at password.c:14
+14		if (PwStatus == 0) {
+(gdb) disassemble
+Dump of assembler code for function main:
+   0x000055555555471a <+0>:	push   %rbp
+   0x000055555555471b <+1>:	mov    %rsp,%rbp
+   0x000055555555471e <+4>:	sub    $0x10,%rsp
+   0x0000555555554722 <+8>:	lea    0xfb(%rip),%rdi        # 0x555555554824
+   0x0000555555554729 <+15>:	callq  0x5555555545c0 <puts@plt>
+   0x000055555555472e <+20>:	callq  0x555555554765 <IsPassOk>
+   0x0000555555554733 <+25>:	mov    %eax,-0x4(%rbp)
+=> 0x0000555555554736 <+28>:	cmpl   $0x0,-0x4(%rbp)
+   0x000055555555473a <+32>:	jne    0x555555554752 <main+56>
+   0x000055555555473c <+34>:	lea    0xf1(%rip),%rdi        # 0x555555554834
+   0x0000555555554743 <+41>:	callq  0x5555555545c0 <puts@plt>
+   0x0000555555554748 <+46>:	mov    $0x1,%edi
+   0x000055555555474d <+51>:	callq  0x5555555545f0 <exit@plt>
+   0x0000555555554752 <+56>:	lea    0xe9(%rip),%rdi        # 0x555555554842
+   0x0000555555554759 <+63>:	callq  0x5555555545c0 <puts@plt>
+   0x000055555555475e <+68>:	mov    $0x0,%eax
+   0x0000555555554763 <+73>:	leaveq 
+   0x0000555555554764 <+74>:	retq   
+End of assembler dump.
+(gdb) n
+15			printf("Bad password!\n");
+(gdb) disassemble
+Dump of assembler code for function main:
+   0x000055555555471a <+0>:	push   %rbp
+   0x000055555555471b <+1>:	mov    %rsp,%rbp
+   0x000055555555471e <+4>:	sub    $0x10,%rsp
+   0x0000555555554722 <+8>:	lea    0xfb(%rip),%rdi        # 0x555555554824
+   0x0000555555554729 <+15>:	callq  0x5555555545c0 <puts@plt>
+   0x000055555555472e <+20>:	callq  0x555555554765 <IsPassOk>
+   0x0000555555554733 <+25>:	mov    %eax,-0x4(%rbp)
+   0x0000555555554736 <+28>:	cmpl   $0x0,-0x4(%rbp)
+   0x000055555555473a <+32>:	jne    0x555555554752 <main+56>
+=> 0x000055555555473c <+34>:	lea    0xf1(%rip),%rdi        # 0x555555554834
+   0x0000555555554743 <+41>:	callq  0x5555555545c0 <puts@plt>
+   0x0000555555554748 <+46>:	mov    $0x1,%edi
+   0x000055555555474d <+51>:	callq  0x5555555545f0 <exit@plt>
+   0x0000555555554752 <+56>:	lea    0xe9(%rip),%rdi        # 0x555555554842
+   0x0000555555554759 <+63>:	callq  0x5555555545c0 <puts@plt>
+   0x000055555555475e <+68>:	mov    $0x0,%eax
+   0x0000555555554763 <+73>:	leaveq 
+   0x0000555555554764 <+74>:	retq   
+End of assembler dump.
+(gdb) info frame
+Stack level 0, frame at 0x7fffffffe310:
+ rip = 0x55555555473c in main (password.c:15); saved rip = 0x0
+ source language c.
+ Arglist at 0x7fffffffe300, args: 
+ Locals at 0x7fffffffe300, Previous frame's sp is 0x7fffffffe310
+ Saved registers:
+  rbp at 0x7fffffffe300, rip at 0x7fffffffe308
+(gdb) x/32bx 0x7fffffffe340
+0x7fffffffe340:	0x70	0xe3	0xff	0xff	0x33	0x33	0x33	0x33
+0x7fffffffe348:	0x33	0x33	0x33	0x33	0x33	0x33	0x33	0x33
+0x7fffffffe350:	0x00	0xe3	0xff	0xff	0xff	0x7f	0x00	0x00
+0x7fffffffe358:	0x33	0x47	0x55	0x55	0x55	0x55	0x00	0x00
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 14748] will be killed.
+
+Quit anyway? (y or n) y
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# gdb ./password
+GNU gdb (Ubuntu 8.1.1-0ubuntu1) 8.1.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./password...done.
+(gdb) b 12
+Breakpoint 1 at 0x72e: file password.c, line 12.
+(gdb) run < pass.txt
+Starting program: /home/alex/Alushkin/ex5/password < pass.txt
+Enter password:
+
+Breakpoint 1, main () at password.c:12
+12		PwStatus = IsPassOk();
+(gdb) step
+IsPassOk () at password.c:28
+28		gets(Pass);
+(gdb) n
+30		return 0 == strcmp(Pass, "test");
+(gdb) x/32xb 0x7fffffffe340
+0x7fffffffe340:	0x70	0xe3	0xff	0xff	0x33	0x33	0x33	0x33
+0x7fffffffe348:	0x33	0x33	0x33	0x33	0x33	0x33	0x33	0x33
+0x7fffffffe350:	0x00	0xe3	0xff	0xff	0xff	0x7f	0x00	0x00
+0x7fffffffe358:	0x33	0x47	0x55	0x55	0x55	0x55	0x00	0x00
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 14764] will be killed.
+
+Quit anyway? (y or n) y
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# gdb ./password
+GNU gdb (Ubuntu 8.1.1-0ubuntu1) 8.1.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./password...done.
+(gdb) b 12
+Breakpoint 1 at 0x72e: file password.c, line 12.
+(gdb) run < pass.txt
+Starting program: /home/alex/Alushkin/ex5/password < pass.txt
+Enter password:
+
+Breakpoint 1, main () at password.c:12
+12		PwStatus = IsPassOk();
+(gdb) s
+IsPassOk () at password.c:28
+28		gets(Pass);
+(gdb) x/32bx 0x7fffffffe340
+0x7fffffffe340:	0x70	0xe3	0xff	0xff	0xff	0x7f	0x00	0x00
+0x7fffffffe348:	0x10	0x46	0x55	0x55	0x55	0x55	0x00	0x00
+0x7fffffffe350:	0x70	0xe3	0xff	0xff	0xff	0x7f	0x00	0x00
+0x7fffffffe358:	0x33	0x47	0x55	0x55	0x55	0x55	0x00	0x00
+(gdb) n
+30		return 0 == strcmp(Pass, "test");
+(gdb) x/32bx 0x7fffffffe340
+0x7fffffffe340:	0x70	0xe3	0xff	0xff	0x33	0x33	0x33	0x33
+0x7fffffffe348:	0x33	0x33	0x33	0x33	0x33	0x33	0x33	0x33
+0x7fffffffe350:	0x00	0xe3	0xff	0xff	0xff	0x7f	0x00	0x00
+0x7fffffffe358:	0x33	0x47	0x55	0x55	0x55	0x55	0x00	0x00
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 14776] will be killed.
+
+Quit anyway? (y or n) y
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# gdb ./password
+GNU gdb (Ubuntu 8.1.1-0ubuntu1) 8.1.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./password...done.
+(gdb) b 12
+Breakpoint 1 at 0x72e: file password.c, line 12.
+(gdb) run < pass.txt
+Starting program: /home/alex/Alushkin/ex5/password < pass.txt
+Enter password:
+
+Breakpoint 1, main () at password.c:12
+12		PwStatus = IsPassOk();
+(gdb) s
+IsPassOk () at password.c:28
+28		gets(Pass);
+(gdb) x/32xb 0x7fffffffe340
+0x7fffffffe340:	0x70	0xe3	0xff	0xff	0xff	0x7f	0x00	0x00
+0x7fffffffe348:	0x10	0x46	0x55	0x55	0x55	0x55	0x00	0x00
+0x7fffffffe350:	0x70	0xe3	0xff	0xff	0xff	0x7f	0x00	0x00
+0x7fffffffe358:	0x33	0x47	0x55	0x55	0x55	0x55	0x00	0x00
+(gdb) n
+30		return 0 == strcmp(Pass, "test");
+(gdb) x/32xb 0x7fffffffe340
+0x7fffffffe340:	0x70	0xe3	0xff	0xff	0x33	0x33	0x33	0x33
+0x7fffffffe348:	0x33	0x33	0x33	0x33	0x33	0x33	0x33	0x33
+0x7fffffffe350:	0x00	0xe3	0xff	0xff	0xff	0x7f	0x00	0x00
+0x7fffffffe358:	0x33	0x47	0x55	0x55	0x55	0x55	0x00	0x00
+(gdb) quit
+A debugging session is active.
+
+	Inferior 1 [process 14796] will be killed.
+
+Quit anyway? (y or n) y
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# gdb ./password
+GNU gdb (Ubuntu 8.1.1-0ubuntu1) 8.1.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./password...done.
+(gdb) b 12
+Breakpoint 1 at 0x72e: file password.c, line 12.
+(gdb) run < pass.txt
+Starting program: /home/alex/Alushkin/ex5/password < pass.txt
+Enter password:
+
+Breakpoint 1, main () at password.c:12
+12		PwStatus = IsPassOk();
+(gdb) s
+IsPassOk () at password.c:28
+28		gets(Pass);
+(gdb) x/32xb 0x7fffffffe340
+0x7fffffffe340:	0x70	0xe3	0xff	0xff	0xff	0x7f	0x00	0x00
+0x7fffffffe348:	0x10	0x46	0x55	0x55	0x55	0x55	0x00	0x00
+0x7fffffffe350:	0x70	0xe3	0xff	0xff	0xff	0x7f	0x00	0x00
+0x7fffffffe358:	0x33	0x47	0x55	0x55	0x55	0x55	0x00	0x00
+(gdb) n
+30		return 0 == strcmp(Pass, "test");
+(gdb) x/32xb 0x7fffffffe340
+0x7fffffffe340:	0x70	0xe3	0xff	0xff	0x33	0x33	0x33	0x33
+0x7fffffffe348:	0x33	0x33	0x33	0x33	0x33	0x33	0x33	0x33
+0x7fffffffe350:	0x70	0xe3	0xff	0xff	0xff	0x7f	0x00	0x00
+0x7fffffffe358:	0x52	0x47	0x55	0x55	0x55	0x55	0x00	0x00
+(gdb) n
+31	}
+(gdb) n
+main () at password.c:18
+18			printf("Access granted!\n");
+(gdb) n
+Access granted!
+21		return 0;
+(gdb) n
+22	}
+(gdb) n
+__libc_start_main (main=0x55555555471a <main>, argc=1, argv=0x7fffffffe458, init=<optimized out>, fini=<optimized out>, 
+    rtld_fini=<optimized out>, stack_end=0x7fffffffe448) at ../csu/libc-start.c:344
+344	../csu/libc-start.c: Нет такого файла или каталога.
+(gdb) n
+[Inferior 1 (process 14843) exited normally]
+(gdb) quit
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# ./password < pass.txt 
+Enter password:
+Ошибка сегментирования (стек памяти сброшен на диск)
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# ./password < pass.txt 
+Enter password:
+Ошибка сегментирования (стек памяти сброшен на диск)
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# ./password < pass.txt 
+Enter password:
+Ошибка сегментирования (стек памяти сброшен на диск)
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# ./password < pass.txt 
+Enter password:
+Ошибка сегментирования (стек памяти сброшен на диск)
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# ./password < pass.txt 
+Enter password:
+Ошибка сегментирования (стек памяти сброшен на диск)
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# ./password < pass.txt 
+Enter password:
+Ошибка сегментирования (стек памяти сброшен на диск)
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# 
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# gdb ./password
+GNU gdb (Ubuntu 8.1.1-0ubuntu1) 8.1.1
+Copyright (C) 2018 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu".
+Type "show configuration" for configuration details.
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>.
+Find the GDB manual and other documentation resources online at:
+<http://www.gnu.org/software/gdb/documentation/>.
+For help, type "help".
+Type "apropos word" to search for commands related to "word"...
+Reading symbols from ./password...done.
+(gdb) run < pass.txt
+Starting program: /home/alex/Alushkin/ex5/password < pass.txt
+Enter password:
+Access granted!
+[Inferior 1 (process 14866) exited normally]
+(gdb) run < pass.txt
+Starting program: /home/alex/Alushkin/ex5/password < pass.txt
+Enter password:
+Access granted!
+[Inferior 1 (process 14870) exited normally]
+(gdb) quit
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# ls
+genfile  genfile.c  Makefile  pass.sh  pass.txt  password  password.c
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# ./password
+Enter password:
+333333333333p����^?^@^@RGUUUU^@^@
+Ошибка сегментирования (стек памяти сброшен на диск)
+root@alex-HP-Pavilion-Notebook:/home/alex/Alushkin/ex5# 
+
