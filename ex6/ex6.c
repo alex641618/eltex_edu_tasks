@@ -2,7 +2,7 @@
 #include <linux/unistd.h>
 #include <stdlib.h>
 #include <malloc.h>
-
+#include <string.h>
 
 char *c, *poisk, *buffer;
 int kol=0, pexit=0, met=0, chel=0, ik=1, h=0, w=0, len, *N, first=0, second=0, a=1;
@@ -47,14 +47,14 @@ int fpoisk(char *poisk)
 
 		for (int i=0; i<chel; i++) {
 
-	        for(int j=0; j<sizeof(poisk); j++) {
+	        for(int j=0; j<strlen(poisk); j++) {
 
 	            if (poisk[j]==my_sprav[i]->num[j])
 					kol++;
 
 	        }
 
-				if (kol==sizeof(poisk)){
+				if (kol==strlen(poisk)){
 					printf("%-20s", my_sprav[i] -> first_name);
 					printf("%-20s", my_sprav[i] -> second_name);
 					printf("%-11s\n", my_sprav[i] -> num);
