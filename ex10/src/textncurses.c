@@ -8,6 +8,8 @@
 
 #include <sys/ioctl.h>
 
+int flag=0;
+
 void sig_winch(int signo) {
 	struct winsize size;
 	ioctl(fileno(stdout), TIOCGWINSZ, (char *) &size);
@@ -17,26 +19,72 @@ void sig_winch(int signo) {
 char *get_string(int *len) 
 {
 	*len = 0;
+	int fl=0, x1=0, y1=0, ymax=0, xmax=0, i=0;
 	int capacity = 1;
 	char *s = (char*) malloc(capacity * sizeof(char)); 
-	char c = getch();
-	wechochar(curscr, c);
-	while (c != '\n') 
-	{ 
-		
-		
-		s[(*len)++] = c;
+	int c;
+	keypad(stdscr, 1);
+	do{ 	
+		c = wgetch(stdscr); 
+		//define_key("KEY_LEFT", 0x104);
+			switch(c) { 
+			case KEY_BACKSPACE:
+				if (fl==1) {
+					move(x1-1, ymax-1);
+					i--;
+					while (inch() == ' ') {
+					getyx(stdscr, x1, y1);
+					move(x1, y1-1);
+					}
+					move(x1, y1);
+					getyx(stdscr, x1, y1);
+					fl=0;
+				}
+				getmaxyx(stdscr, xmax, ymax);
+				getyx(stdscr, x1, y1);
+				if (y1 == 0 && x1 != 0) {
+					wdelch(stdscr);
+					fl=1;
+				}
+				//else if (y1==0 && x1==0)
+				//	continue;
+				wdelch(stdscr);
+				//refresh();
+				//capacity--;
+				//s = (char*) realloc(s, capacity * sizeof(char));
+				//s[*len-1] = '\0';
+				continue;
+			case KEY_LEFT:
+				x1=0; y1=0;
+				getyx(stdscr, x1, y1);
+				move(x1, y1-1);
+				continue;
+			case KEY_RIGHT: 
+				x1=0; y1=0;
+				getyx(stdscr, x1, y1);
+				move(x1, y1+1);
+				continue;
+			case KEY_UP:
+				x1=0; y1=0;
+				getyx(stdscr, x1, y1);
+				move(x1-1, y1);
+			case KEY_DOWN:
+				x1=0; y1=0;
+				getyx(stdscr, x1, y1);
+				move(x1+1, y1);
+			case '\n':
+				i++;
+				move (i, 0);
+				continue;
+			}
+		s[(*len)++] = (char) c;
 		if (*len >= capacity)
 		{ 
 			capacity++; 
 			s = (char*) realloc(s, capacity * sizeof(char)); 
 		}
-		//printf("dds");
-		c = getch();
-		//printf("ddd");
-		wechochar(curscr, c);
-	} 
-	s[*len] = '\0'; 
+	} while (1);
+	//s[*len] = '\0'; 
 	return s;
 }
 
@@ -45,14 +93,13 @@ int open_and_write(char *filename) {
 	int symb, counter=0;
 		int x, y;
 	int len, preveof=0;
-	pf=fopen(filename, "r");
-	pfw=fopen(filename, "a");
+	pf=fopen(filename, "a+");
 	//printf("kl\n");
 	if (pf==NULL){
 		printf("error cf");
 		return -1;
 	}
-	int i=1;
+	int i=0;
 	do {
 		//fread(&symb, sizeof(char), 1, pf);
 		symb = fgetc(pf);
@@ -67,6 +114,7 @@ int open_and_write(char *filename) {
 			counter++;
 			addch(symb);
 			preveof=1;
+			i++;
 			continue;
 		}
 		preveof=0;
@@ -76,13 +124,12 @@ int open_and_write(char *filename) {
 		//wechochar(curscr, symb);
 	} while (symb!= EOF);
 	move(x, counter);
-	while(1) {
-	char *data = get_string(&len);
-	fwrite((void *) data, sizeof(char), strlen(data), pfw);
-	move (i, 0);
-	i++;
+	while(flag == 0) {
+		char *data = get_string(&len);
+		//write(fileno(pf), data, strlen(data));
+		i++;
+		move (i, 0);
 	}
-
 	fclose(pf);
 	return 0;
 }
