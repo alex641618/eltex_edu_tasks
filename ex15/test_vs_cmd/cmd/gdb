@@ -1,0 +1,76 @@
+(gdb) 
+55				acommand = (char**) realloc(acommand, size*sizeof(char*)); //????????????? не выделяется достаточно памяти
+(gdb) p ret
+$14 = 0x7fffffffe1ca "6"
+(gdb) n
+56				if (acommand == NULL) {
+(gdb) 
+60					acommand[count] = (char*) realloc(acommand[count], (strlen(ret)+1)*sizeof(char));
+(gdb) p count
+$15 = 5
+(gdb) p acommand[4]
+$16 = 0x555555757f00 "5"
+(gdb) p acommand[5]
+$17 = 0x20211 <error: Cannot access memory at address 0x20211>
+(gdb) p size
+$18 = 12
+(gdb) s
+__strlen_avx2 () at ../sysdeps/x86_64/multiarch/strlen-avx2.S:55
+55	../sysdeps/x86_64/multiarch/strlen-avx2.S: Нет такого файла или каталога.
+(gdb) 
+56	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+57	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+60	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+61	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+62	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+94	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+95	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+96	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+97	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+99	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+100	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+101	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+102	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+108	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+109	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+110	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+114	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+__strlen_avx2 () at ../sysdeps/x86_64/multiarch/strlen-avx2.S:115
+115	in ../sysdeps/x86_64/multiarch/strlen-avx2.S
+(gdb) 
+__GI___libc_realloc (oldmem=0x20211, bytes=2) at malloc.c:3140
+3140	malloc.c: Нет такого файла или каталога.
+(gdb) 
+3147	in malloc.c
+(gdb) 
+3148	in malloc.c
+(gdb) 
+3152	in malloc.c
+(gdb) 
+3159	in malloc.c
+(gdb) 
+3165	in malloc.c
+(gdb) 
+
+Program received signal SIGSEGV, Segmentation fault.
+__GI___libc_realloc (oldmem=0x20211, bytes=2) at malloc.c:3165
+3165	in malloc.c
+(gdb) 
+
