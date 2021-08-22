@@ -38,8 +38,8 @@ int main(int argc, char* argv[]) {
 
 	//printf("start server\n");
 	errno=0;
-    ret = mq_receive(queue, buffer, BUFFER_SIZE, &pfc);
-    if (ret<0) {
+	ret = mq_receive(queue, buffer, BUFFER_SIZE, &pfc);
+	if (ret<0) {
 		perror("error");
 		printf("ret = %d", ret);
 		mq_close(queue);
