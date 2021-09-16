@@ -1,18 +1,23 @@
-#include <stdio.h>
+#include <termios.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <mqueue.h>
-#include <fcntl.h>
 #include <string.h>
-#include <errno.h>
 #include <signal.h>
+#include <curses.h>
+#include <malloc.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <fcntl.h>
+#include <errno.h>
 
 #include <sys/select.h>
-#include <sys/time.h>
+#include <sys/ioctl.h> 
 #include <sys/types.h>
+#include <sys/time.h>
 #include <sys/stat.h>
 #include <sys/ipc.h>
-#include <sys/msg.h>   
+#include <sys/msg.h>
 
 short cexit=0;
 
@@ -30,6 +35,7 @@ struct reg {
     long message_type;
     pid_t regc;
 };
+
 
 void hdl(int sig) {
 	cexit = 1;
@@ -53,12 +59,12 @@ int main(int argc, char* argv[]) {
 	sigaddset(&set, SIGINT); 
 	act.sa_mask = set;
 	sigaction(SIGINT, &act, 0);
+	system("rm -rf chat-client");
 
 	if (argv[1] == NULL) {
 		printf("Передайте имя бинарного файла сервера\n");
 		return -1;
 	}
-
 	errno=0;
 	key = ftok(argv[1], 'a');
 	if (key < 0) {
@@ -70,6 +76,7 @@ int main(int argc, char* argv[]) {
 	queue = msgget(key, 0);
 	if (queue == -1) { 
 		perror("msgget");
+		printf("try run server\n");
 		return -1;
 	}
 	reg = getpid();
@@ -85,8 +92,9 @@ int main(int argc, char* argv[]) {
 		return -1;
 	}
 	//int cwhile=0;
+	printf("you are client%d, write your messages\n", reg);
 	while(cexit==0) {
-		if (scanf("%[^\n]", message.buf) > 0) {
+		if (fgets(message.buf, 200, stdin) != NULL) {
 			message.message_type = reg;
 			ret = msgsnd(queue, &message, 200, IPC_NOWAIT);
 			if (ret!=0) {

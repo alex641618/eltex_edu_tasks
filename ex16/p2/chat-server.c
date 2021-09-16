@@ -1,16 +1,20 @@
-#include <stdio.h>
+#include <termios.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <mqueue.h>
-#include <fcntl.h>
 #include <string.h>
-#include <errno.h>
 #include <signal.h>
+#include <curses.h>
+#include <malloc.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <errno.h>
 
 #include <sys/select.h>
-#include <sys/time.h>
+#include <sys/ioctl.h> 
 #include <sys/types.h>
-#include <sys/stat.h> 
+#include <sys/time.h>
+#include <sys/stat.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
 
@@ -19,10 +23,12 @@
 
 short cexit=0;
 
-/*struct message_text {
-    int uid;
-    char buf [200];
-};*/
+
+void sig_winch(int signo) {
+	struct winsize size;
+	ioctl(fileno(stdout), TIOCGWINSZ, (char *) &size);
+	resizeterm(size.ws_row, size.ws_col);
+}
 
 struct message {
     long message_type;
@@ -46,9 +52,10 @@ int main(int argc, char* argv[]) {
 	pid_t reg;
 	key_t key;
 	int i=0, ret = 0, f=0;
-	long add = 1, del = 2; 
+	long add = 1, del = 2, log = 3;
 	struct reg adds;
 	struct reg dels;
+	struct reg logs;
 	struct message message;
 	pid_t *list = malloc(10*sizeof(pid_t));
 	struct sigaction act;
@@ -59,11 +66,17 @@ int main(int argc, char* argv[]) {
 	sigaddset(&set, SIGINT);
 	act.sa_mask = set;
 	sigaction(SIGINT, &act, 0);
-
+	char *pwd = getenv("PWD");
 	errno=0;
 	FILE *pf = fopen(chatfile, "a+");
+	initscr();
+	signal(SIGWINCH, sig_winch);
+	cbreak();
+	noecho();
+	curs_set(0);
 	if (pf == NULL) {
 		perror("fopen");
+		endwin();
 		return -1;
 	}
 
@@ -71,6 +84,7 @@ int main(int argc, char* argv[]) {
 	key = ftok(argv[0], 'a');
 	if (key < 0) {
 		perror("ftok");
+		endwin();
 		return -1;
 	}
 
@@ -80,8 +94,34 @@ int main(int argc, char* argv[]) {
 		perror("msgget");
 		printf("ret= %d\n", queue);
 		fclose(pf);
+		endwin();
 		return -1;
 	}
+	sprintf(cmd, "xterm -e '%s/iface chat-server' &", pwd);
+	system(cmd);
+	errno=0;
+	ret = msgrcv(queue, &logs, 0, log, IPC_NOWAIT);
+	if (ret<0 && errno!=EAGAIN && errno!=ENOMSG) {
+		perror("msgrcv");
+		printf("ret = %d\n", ret);
+		msgctl(queue, IPC_RMID, NULL);
+		fclose(pf);
+		endwin();
+		return -1;
+	}
+	while (errno == ENOMSG) {
+		errno=0;
+		ret = msgrcv(queue, &logs, sizeof(pid_t), log, IPC_NOWAIT);
+		if (ret<0 && errno!=EAGAIN && errno!=ENOMSG) {
+			perror("msgrcv");
+			printf("ret = %d\n", ret);
+			msgctl(queue, IPC_RMID, NULL);
+			fclose(pf);
+			endwin();
+			return -1;
+		}
+	}
+
 	int whilec = 0;
 	int deb=0;
 	while (cexit==0) {
@@ -93,14 +133,18 @@ int main(int argc, char* argv[]) {
 				printf("ret = %d\n", ret);
 				msgctl(queue, IPC_RMID, NULL);
 				fclose(pf);
+				endwin();
+				kill(logs.regc, SIGINT);
 				return -1;
 			} else if (ret > 0 ) {
-				sprintf(buf, "%d: %s\n", list[f], message.buf);
+				sprintf(buf, "client%d: %s", list[f], message.buf);
 				ret = write(fileno(pf), buf, strlen(buf)+1);
 				if (ret < 0) {
 					perror("writeFOR");
 					msgctl(queue, IPC_RMID, NULL);
 					fclose(pf);
+					endwin();
+					kill(logs.regc, SIGINT);
 				}
 			}
 		}
@@ -114,6 +158,8 @@ int main(int argc, char* argv[]) {
 			printf("ret = %d\n", ret);
 			msgctl(queue, IPC_RMID, NULL);
 			fclose(pf);
+			endwin();
+			kill(logs.regc, SIGINT);
 			return -1;
 		} else if (ret > 0 ) {
 			errno=0;
@@ -122,15 +168,19 @@ int main(int argc, char* argv[]) {
 				perror("realloc1");
 				msgctl(queue, IPC_RMID, NULL);
 				fclose(pf);
+				endwin();
+				kill(logs.regc, SIGINT);
 			}
 			list[i] = adds.regc;
 			errno=0;
-			sprintf(buf, "add client: %d\n", adds.regc);
+			sprintf(buf, "add client%d\n", adds.regc);
 			ret = write(fileno(pf), buf, strlen(buf)+1);
 			if (ret < 0) {
 				perror("write1");
 				msgctl(queue, IPC_RMID, NULL);
 				fclose(pf);
+				endwin();
+				kill(logs.regc, SIGINT);
 			}
 			i++;
 			deb=0;
@@ -143,15 +193,19 @@ int main(int argc, char* argv[]) {
 			printf("ret = %d\n", ret);
 			msgctl(queue, IPC_RMID, NULL);
 			fclose(pf);
+			endwin();
+			kill(logs.regc, SIGINT);
 			return -1;
 		} else if (ret > 0 ) {
 			errno=0;
-			sprintf(buf, "del client: %d\n", dels.regc);
+			sprintf(buf, "del client%d\n", dels.regc);
 			ret = write(fileno(pf), buf, strlen(buf)+1);
 			if (ret < 0) {
 				perror("write2");
 				msgctl(queue, IPC_RMID, NULL);
 				fclose(pf);
+				endwin();
+				kill(logs.regc, SIGINT);
 			}
 			int s=i;
 			for(s; s>=0; s--) {
@@ -170,22 +224,30 @@ int main(int argc, char* argv[]) {
 				perror("realloc2");
 				msgctl(queue, IPC_RMID, NULL);
 				fclose(pf);
+				endwin();
+				kill(logs.regc, SIGINT);
 			}
 		}
 		if (deb == 0 ) {
+			clear();
+			move(0, 0);
+			printw("clients:\n");
 			for (int k = 0; k<i; k++) {
-				printf("%d ", list[k]);
+				printw("%d ", list[k]);
 			}
-			printf("\n\n");
+			printw("\n");
 			deb = 1;
 		}
-		whilec++;
+		refresh();
+		//whilec++;
 	}
 
 	msgctl(queue, IPC_RMID, NULL);
 	fclose(pf);
 	sprintf(cmd, "rm -rf %s", chatfile); // заменить на unlink()
 	system(cmd);
+	kill(logs.regc, SIGINT);
+	endwin();
 	printf("\nexit\n");
 	return 0;
 }
