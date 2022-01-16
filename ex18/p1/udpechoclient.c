@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <limits.h>
+#include <signal.h>
 //#include <linux/ioctl.h>
 
 #include <sys/ioctl.h>
@@ -18,7 +19,25 @@
 #define ADDRLENTH 16
 #define MSGLEN 24
 
+short cexit=0;
+
+void hdl(int sig) {
+	printf("exit\n");
+	cexit = 1;
+}
+
 int main (int argc, char* argv[]) {
+
+	struct sigaction act;
+	memset(&act, 0, sizeof(act));
+	act.sa_handler = hdl;
+	sigset_t   set; 
+	sigemptyset(&set);                                                             
+	sigaddset(&set, SIGINT); 
+	act.sa_mask = set;
+	sigaction(SIGINT, &act, 0);
+
+
 	char servaddr[ADDRLENTH], ifname[IFNAMSIZ]={0}, msg[MSGLEN];
 	unsigned short port =0;
 	struct sockaddr_in server;
@@ -68,18 +87,18 @@ int main (int argc, char* argv[]) {
 	}
 	bzero(&server, sizeof(server));
 	server.sin_family = AF_INET;
-	server.sin_port=port;
+	server.sin_port=htons(port);
 	errno=0;
 	if(inet_aton(servaddr, &server.sin_addr)==0) {
 		perror("inet_aton");
 		goto cleanup;
 	}
 	memset(msg, 0xFF, MSGLEN);
-	if (ifname == 0)
+	if (ifname)
 		setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, ifname, strlen(ifname)+1);
 	else 
 		printf("using default interface\n");
-	while (1) {
+	while (cexit!=1) {
 		errno=0;
 		int ret=sendto(sock, msg, MSGLEN, 0, (struct sockaddr *)&server, tolen);
 		if (errno!=0) {
