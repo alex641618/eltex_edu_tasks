@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <limits.h>
-//#include <linux/ioctl.h>
+#include <signal.h>
 
 #include <sys/ioctl.h>
 #include <net/if.h>
@@ -18,11 +18,30 @@
 #define ADDRLENTH 16
 #define MSGLEN 24
 
+short cexit=0;
+
+void hdl(int sig) {
+	printf("exit\n");
+	cexit = 1;
+}
+
+
 int main (int argc, char* argv[]) {
-	char clientaddr[ADDRLENTH], ifname[IFNAMSIZ], msg[MSGLEN];
+	struct sigaction act;
+	memset(&act, 0, sizeof(act));
+	act.sa_handler = hdl;
+	sigset_t   set; 
+	sigemptyset(&set);                                                             
+	sigaddset(&set, SIGINT); 
+	act.sa_mask = set;
+	sigaction(SIGINT, &act, 0);
+
+	char clientaddr[ADDRLENTH]={0}, ifname[IFNAMSIZ]={0}, msg[MSGLEN];
 	unsigned short port;
 	struct sockaddr_in client;
-	struct in_addr address;
+	bzero(&client, sizeof(client));
+	struct sockaddr_in server;
+
 	if (argc > 1) {
 		int k=1;
 		while (k<argc) {
@@ -43,42 +62,70 @@ int main (int argc, char* argv[]) {
 				printf("ifname = %s\n", ifname);
 				k+=2;
 			} else if (strcmp(argv[k], "-h") == 0 || strcmp(argv[k], "--help") == 0) {
-				printf("usage: udpechoserver -a [adress] -p [port]\nif are you want use special intarface use -i [interface]\n");
+				printf("usage: udpechoserver -p [port]\nif are you want use special intarface use -i [interface]\n");
 				return 0;
 			} else {
 				k++;
-				printf("invalid argument\nusage: udpechoserver -a [adress] -p [port]\nif are you want use special intarface use -i [interface]\n");
+				printf("invalid argument\nusage: udpechoserver -p [port]\nif are you want use special intarface use -i [interface]\n");
 				printf("enter -h or --help for help usege\n");
 				return -1;
 			}
 		}
 
 	} else {
-		printf("usage: udpechoserver -a [adress] -p [port]\nif are you want use special intarface use -i [interface]\n");
+		printf("usage: udpechoserver -p [port]\nif are you want use special intarface use -i [interface]\n");
 		printf("enter -h or --help for help usege\n");
 		return -1;
 	}
+	
 	errno=0;
 	int sock = socket(AF_INET, SOCK_DGRAM, 17);
+
 	if (sock == -1) {
 		perror("socket");
 		return -1;
 	}
-	client.sin_family = AF_INET;
-	client.sin_port=port;
+
+	if (ifname)
+		setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, ifname, strlen(ifname)+1);
+
+	server.sin_family = AF_INET;
+	server.sin_addr.s_addr = htonl(INADDR_ANY);
+	server.sin_port=htons(port);
 	errno=0;
-	if(inet_aton(clientaddr, &client.sin_addr)==0) {
-		perror("inet_aton");
+	int fromlen = sizeof(client);
+	memset(msg, 0xFF, MSGLEN);
+	errno=0;
+	int ret=bind(sock, (struct sockaddr*)&server, sizeof(server));
+	
+	if (ret!=0){
+		perror("bind");
 		goto cleanup;
 	}
-	memset(msg, 0xFF, MSGLEN);
-	setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, ifname, strlen(ifname)+1);
-	bind(sock, (struct sockaddr*)&client, sizeof(client));
+	
 	while (1) {
+
+		if (cexit==1)
+			break;
+
 		errno=0;
-		int ret=recvfrom(sock, msg, MSGLEN, 0, (struct sockaddr *)&client, (socklen_t *)sizeof(client));
-		printf("ret=%d\n", ret);
-		printf("errno=%d\n\n", errno); 
+		int ret=recvfrom(sock, msg, MSGLEN, 0, (struct sockaddr *)&client, &fromlen);
+		if (ret<0)
+			perror("recvfrom");
+		else
+			printf("recieved\n");
+
+		if (cexit==1)
+			break;
+
+		errno=0;
+		ret=sendto(sock, msg, MSGLEN, 0, (struct sockaddr *)&client, fromlen);
+
+		if (ret<0)
+			perror("sendto");
+		else
+			printf("sended");
+
 	}
 
 	close(sock);
