@@ -1,0 +1,17 @@
+Для компиляции сервера выполните команду:
+# make tcpechoserver
+
+Для компиляции клиента выполните команду:
+# make tcpechoclient
+
+Запустите клиент командой:
+# ./tcpechoclient -a [server address] -p [port] -i <interface>
+
+Запустите сервер командой:
+# ./tcpechoserver -a <client address> -p [port] -i <interface>
+
+Чтобы удалить бинарные файлы выполните команду:
+# make clean
+
+*[parameter] - обязательные аргументы
+ <parameter> - необязательные аргументы
